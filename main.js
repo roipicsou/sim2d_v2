@@ -5,7 +5,7 @@ fonctionalitéer a ajouter :
   - deplacement
   - cycle jour/nuit
   - création de desandace
-  - modification a la nécance
+  - modification a la nécance //////
 
 */
 
