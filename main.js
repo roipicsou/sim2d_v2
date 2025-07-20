@@ -1,7 +1,6 @@
 /*
 
 fonctionalitéer a ajouter :
-  - deplacement
   - cycle jour/nuit
   - création de desandace
   - modification a la nécance
@@ -12,38 +11,38 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
 class Creature {
-    constructor(){
-        this.x = 10;
-        this.y = 50;
-        this.radius = 5;
-        this.color = 'red';
-        this.speed = 2;
-    }
+  constructor(x, y, speed = 2) {
+    this.x = x;
+    this.y = y;
+    this.radius = 5;
+    this.color = 'red';
+    this.speed = speed;
+  }
 
-    draw(ctx) {
+  draw(ctx) {
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
     ctx.fillStyle = this.color;
     ctx.fill();
-    }
+  }
 
-    find_food(Foods) {
-      let food = null;
+  find_food(Foods) {
+    let food = null;
 
-      for (let item of Foods) {
-        const dx = item.x - this.x;
-        const dy = item.y - this.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        console.log(distance);
+    for (let item of Foods) {
+      const dx = item.x - this.x;
+      const dy = item.y - this.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      console.log(distance);
 
-        if (!food || distance < Math.sqrt((food.x - this.x) ** 2 + (food.y - this.y) ** 2)) {
-          food = item;
-        }
+      if (!food || distance < Math.sqrt((food.x - this.x) ** 2 + (food.y - this.y) ** 2)) {
+        food = item;
       }
-      return food;
     }
+    return food;
+  }
 
-    move(Foods) {
+  move(Foods) {
     const closest = this.find_food(Foods)
 
     if (closest) {
@@ -60,13 +59,13 @@ class Creature {
       this.y += (Math.random() - 0.5) * this.speed * 2;
     }
 
-    }
+  }
 }
 
 class Food {
-  constructor() {
-    this.x = 20;
-    this.y = 50;
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
     this.radius = 5;
     this.color = 'purple';
   }
@@ -82,13 +81,45 @@ class Food {
 const Creatures = [];
 const Foods = [];
 
-ctx.clearRect(0, 0, canvas.width, canvas.height);
+// Initial population
+for (let i = 0; i < 20; i++) {
+  Creatures.push(new Creature(Math.random() * canvas.width, Math.random() * canvas.height));
+}
 
-Creatures.push(new Creature());
-Foods.push(new Food());
+// Initial food
+for (let i = 0; i < 200; i++) {
+  Foods.push(new Food(Math.random() * canvas.width, Math.random() * canvas.height));
+}
 
-const test1 = Creatures[0];
-test1.draw(ctx);
+// Main loop
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-const test2 = Foods[0];
-test2.draw(ctx);
+  for (let food of Foods) {
+    food.draw(ctx);
+  }
+
+  for (let i = Creatures.length - 1; i >= 0; i--) {
+    const creature = Creatures[i];
+    creature.move(Foods);
+
+    // Collision avec la nourriture
+    for (let j = Foods.length - 1; j >= 0; j--) {
+      const food = Foods[j];
+      const dx = food.x - creature.x;
+      const dy = food.y - creature.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < creature.radius + food.radius) {
+        Foods.splice(j, 1); // Retire la nourriture mangée
+        break; // Une seule nourriture par tour
+      }
+    }
+
+    creature.draw(ctx);
+  }
+
+  requestAnimationFrame(animate);
+}
+
+animate();
