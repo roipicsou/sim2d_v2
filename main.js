@@ -47,21 +47,12 @@ class Creature {
 
   move(Foods) {
     if (this.returning) {
-      // Retour au point de départ
-      const dx = this.startX - this.x;
-      const dy = this.startY - this.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 1) {
-        this.x = this.startX;
-        this.y = this.startY;
-        this.returning = false;
-        this.days += 1; // Nouveau jour
-        return;
-      }
-      const directionX = dx / dist;
-      const directionY = dy / dist;
-      this.x += directionX * this.speed;
-      this.y += directionY * this.speed;
+      // Téléportation au point de départ
+      this.x = this.startX;
+      this.y = this.startY;
+      this.returning = false;
+      this.days += 1; // Nouveau jour
+      return;
     } else {
       // Déplacement normal
       const closest = this.find_food(Foods);
@@ -112,7 +103,7 @@ for (let i = 0; i < 200; i++) {
 
 // Ajoute ces variables globales :
 let dayTimer = 0;
-const dayDuration = 30 * 1000; // 30 secondes
+const dayDuration = 3 * 1000; // 30 secondes
 
 // Main loop
 function animate(timestamp) {
